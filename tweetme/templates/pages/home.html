@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block head_title%}
+    Hello Mister
+{% endblock head_title%}
+
+{% block content %}
+
+<h1>Welcome To The Twitter Reborn By InsaneNerd</h1>
+<div id = "tweets">
+    Replace Me
+</div>
+<script>
+    const tweetsElement = document.getElementById('tweets')
+
+    const xhr = new XMLHttpRequest()
+    const method = 'GET'
+    const url = "/tweets"
+    const responseType = "json"
+
+    xhr.responseType = responseType
+    xhr.open(method,url)
+    xhr.onload = function(){
+        const serverResponse = xhr.response
+        var listedItems = serverResponse.response
+        var finaltweetStr = ""
+        var i;
+        for (i=0;i<listedItems.length;++i){
+            console.log(i)
+            console.log(listedItems[i])
+            var currentItem = "<div class='mb-4'><h1>" + listedItems[i].id + "</h1>" + "<p>"+listedItems[i].content+"</p></div>"
+            finaltweetStr+=currentItem
+        }
+        tweetsElement.innerHTML=finaltweetStr;
+        
+    }
+    xhr.send()
+</script>
+{% endblock content%}
