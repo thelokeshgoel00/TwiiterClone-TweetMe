@@ -35,11 +35,25 @@
 <script>
     function handleTweetCreateFormDidSubmit(event){
         event.preventDefault()
+        const myForm = event.target
+        const myFormData = new FormData(myForm)
+        const url = myForm.getAttribute('action')
+        const method = myForm.getAttribute('method')
+        const xhr = new XMLHttpRequest()
+        xhr.open(method,url)
+        xhr.onload = function(){
+            const serverResponse = xhr.response
+            console.log(serverResponse)
+            const tweetsEl = document.getElementById('tweets')
+            loadTweets(tweetsEl)
+        }
+        xhr.send(myFormData)
+        console.log(myForm)
     }
     const tweetCreateFormEl = document.getElementById('tweet-create-form')
     tweetCreateFormEl.addEventListener('submit',handleTweetCreateFormDidSubmit)
     const tweetsEl = document.getElementById('tweets')
-
+    loadTweets(tweetsEl)
     function loadTweets(tweetsElement){
         const xhr = new XMLHttpRequest()
         const method = 'GET'
@@ -63,7 +77,7 @@
         }
         xhr.send()
     }
-    loadTweets(tweetsEl)
+    
 
     function handleDidLike(tweet_id,currentCount){
         console.log(tweet_id,currentCount)
