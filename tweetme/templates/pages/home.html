@@ -19,6 +19,7 @@
     <div class = 'col-md-4 mx-auto col-10'>
         <form class = 'form' id = "tweet-create-form" method = 'POST' action = '/create-tweet'>
             {% csrf_token %}
+            <div class='d-none alert alert-danger' id='tweet-create-form-error'></div>
             <input type = 'hidden' value="/" name="next" />
             <textarea required='required' class = 'form-control' name = 'content' placeholder='Your Tweet..'></textarea>
             <button type = 'submit' class = 'btn btn-primary'>
@@ -33,6 +34,19 @@
     Replace Me
 </div>
 <script>
+    function handleTweetFormError(msg,display){
+        var myErrorDiv = document.getElementById('tweet-create-form-error')
+        if(display===true){
+            //show error
+            myErrorDiv.setAttribute('class','d-block alert alert-danger')
+            myErrorDiv.innerText = msg
+        }
+        else{
+            myErrorDiv.setAttribute('class','d-none alert alert-danger')
+            //hide error
+        }
+    }
+
     function handleTweetCreateFormDidSubmit(event){
         event.preventDefault()
         const myForm = event.target
@@ -47,17 +61,37 @@
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
         xhr.onload = function(){
             if(xhr.status === 201){
+                handleTweetFormError("",false)
                 const newTweet = xhr.response
                 const newTweetElement = formatTweetElement(newTweet)
                 const ogHtml = tweetsContainerElement.innerHTML
                 tweetsContainerElement.innerHTML = newTweetElement + ogHtml
                 myForm.reset()
+            } else if (xhr.status === 400){
+                const errorJson = xhr.response
+                //console.log(errorJson)
+                const contentError = errorJson.content
+                let contentErrorMsg;
+                if(contentError){
+                    contentErrorMsg = contentError[0]
+                    if(contentErrorMsg){
+                        handleTweetFormError(contentErrorMsg,true)
+                    }
+                }                
+                else{
+                    alert('An Error Occured, Pease try Again')
+                }
+            }else if(xhr.status === 500){
+                alert('There was a server error, please try again')
             }
-
+            
             // const serverResponse = xhr.response
             // console.log(serverResponse)
             // const tweetsEl = document.getElementById('tweets')
             // loadTweets(tweetsEl)
+        }
+        xhr.onerror = function(){
+            alert("An Error Occurred.")
         }
         xhr.send(myFormData)
     }
@@ -88,6 +122,7 @@
             tweetsElement.innerHTML=finaltweetStr;
         
         }
+        
         xhr.send()
     }
     

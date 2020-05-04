@@ -41,7 +41,6 @@ def tweet_detail_view(request, tweet_id, *args, **kwargs):
         "id":tweet_id,
     }
     try:
-
         obj = Tweet.objects.get(id=tweet_id)
         data['content'] = obj.content
     except:
