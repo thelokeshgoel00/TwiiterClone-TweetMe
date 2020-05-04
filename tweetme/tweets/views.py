@@ -2,9 +2,11 @@ import random
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse, HttpResponseRedirect
 from django.utils.http import is_safe_url
-from django.conf import settings
+
 from .models import Tweet
 from .forms import TweetForm
+
+ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 # Create your views here.
 def home_view(request,*args,**kwargs):
@@ -18,7 +20,7 @@ def tweet_create_view(request,*args,**kwargs):
         obj.save()
         if request.is_ajax():
             return JsonResponse(obj.serialize(),status=201)
-        if next_url!=None and is_safe_url(next_url,settings.ALLOWED_HOSTS):
+        if next_url!=None and is_safe_url(next_url,ALLOWED_HOSTS):
             return redirect(next_url)
         form = TweetForm()
     if form.errors:
